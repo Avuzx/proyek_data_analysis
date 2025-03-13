@@ -37,11 +37,11 @@ hour_df['mnth'] = pd.Categorical(hour_df['mnth'], categories=months, ordered=Tru
 hour_df.sort_values(by="mnth",inplace=True)
 fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
 colors = ["#FFB4C2", "#9DBDFF", "#a2c4c9","#72BCD4","#e06666","#9fc5e8", "#FF9874","#cfe2f3","#d9d2e9"]
-years_2011 = table['Year'].values == 2011
-total_2011 = table[years_2011]
+year_2011 = table['Year'].values == 2011
+total_2011 = table[year_2011]
 total_2011 = total_2011.groupby(by="Month", observed=False).agg({"Total":  "sum"})
-years_2012 = table['Year'].values == 2012
-total_2012 = table[years_2012]
+year_2012 = table['Year'].values == 2012
+total_2012 = table[year_2012]
 total_2012 = total_2012.groupby(by="Month", observed=False).agg({"Total":  "sum"})
 sns.barplot(y="Total", x="Month", data=total_2011, hue="Total", palette=colors, ax=ax[0])
 ax[0].set_ylabel(None)
