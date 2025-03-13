@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
 from babel.numbers import format_currency
-from Function import DataAnalyst
 import numpy as np
 
 
