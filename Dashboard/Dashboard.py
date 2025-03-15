@@ -7,6 +7,9 @@ import numpy as np
 
 
 hour_df = pd.read_csv('Data/day_cleaned.csv')
+season_cols = hour_df["season"].unique()
+table = hour_df.rename(columns={'yr' : 'Year', 'season' : 'Season', 'casual' : 'Pengguna Tidak Terdaftar', 'registered' : 'Pengguna Terdaftar', 'cnt' : 'Total', 'dteday' : 'Day', 'mnth' : 'Month' })
+
 
 with st.sidebar:
     # Title
@@ -14,11 +17,13 @@ with st.sidebar:
 
     # Logo Image
     st.image("Dashboard/logo.png")
+    selected_season = st.sidebar.selectbox("Choose a season", season_cols)
 
-    # Date Range
+    # Season Range
 
 
-table = hour_df.rename(columns={'yr' : 'Year', 'season' : 'Season', 'casual' : 'Pengguna Tidak Terdaftar', 'registered' : 'Pengguna Terdaftar', 'cnt' : 'Total', 'dteday' : 'Day', 'mnth' : 'Month' })
+
+
 
 # Title
 st.header("Bike Sharing Dashboard")
@@ -62,25 +67,28 @@ st.subheader("Peminjaman Permusim")
 table.groupby(by=["Year", "Season"], observed=False).agg({"Total":  "sum"})
 fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(20, 6))
 colors = ["#FFB4C2", "#9DBDFF", "#a2c4c9","#72BCD4"]
-years_2011 = table['Year'].values == 2011
-total_2011 = table[years_2011]
-total_2011 = total_2011.groupby(by="Season", observed=False).agg({"Total":  "sum"})
-years_2012 = table['Year'].values == 2012
-total_2012 = table[years_2012]
-total_2012 = total_2012.groupby(by="Season", observed=False).agg({"Total":  "sum"})
-sns.barplot(y="Total", x="Season", data=total_2011, hue="Total", palette=colors, ax=ax[0])
+data_filtered = hour_df[hour_df['season'] == selected_season]
+
+# Separate data by year (2011 and 2012)
+data_2011 = data_filtered[data_filtered['yr'] == 2011]
+data_2012 = data_filtered[data_filtered['yr'] == 2012]
+
+# Group by season and year and calculate total rentals (replace 'count' with the actual column name)
+total_2011 = data_2011.groupby("season")["cnt"].sum().reset_index()  # Replace 'count' with actual column name
+total_2012 = data_2012.groupby("season")["cnt"].sum().reset_index()  
+sns.barplot(y="cnt", x="season", data=total_2011, hue="cnt", palette=colors, ax=ax[0])
 ax[0].set_ylabel(None)
 ax[0].set_xlabel(None)
 ax[0].set_title("By Season (2011)", loc="center", fontsize=18)
 ax[0].set_ylim(0, 700000)
 ax[0].tick_params(axis ='x', labelsize=15)
-sns.barplot(y="Total", x="Season", data=total_2012, hue="Total", palette=colors, ax=ax[1])
+sns.barplot(y="cnt", x="season", data=total_2012, hue="cnt", palette=colors, ax=ax[1])
 ax[1].set_ylabel(None)
 ax[1].set_xlabel(None)
 ax[1].set_title("By Season (2012)", loc="center", fontsize=18)
 ax[1].set_ylim(0, 700000)
 ax[1].tick_params(axis ='x', labelsize=15)
-plt.suptitle("Total Peminjaman Berdasarkan Musim", fontsize=20)
+plt.suptitle("cnt Peminjaman Berdasarkan Musim", fontsize=20)
 st.pyplot(fig)
 
 st.subheader("Perbandingan Antara Peminjam Sepeda dengan kategori Pengguna Terdaftar Diaplikasi dengan Pengguna Tidak Terdaftar Diaplikasi")
